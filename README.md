@@ -53,7 +53,7 @@ This repository contains a containerized Python based Extract, Transform, and Lo
 
     * Uses robust groupby(...).size().reset_index(name="count") patterns to avoid column-name drift.
 
-## 🚀 Setup and Running the Pipeline
+## Setup and Running the Pipeline
 
 This solution is designed to run end-to-end with minimal setup using **Docker Compose**.
 
@@ -64,7 +64,7 @@ You must have **Docker** and **Docker Compose** installed on your system.
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-github-repo-link>
+git clone <https://github.com/nauman07/Technical-Task1-Assignment-For-Institute-of-Biomedical-Informatics-BI-K-Uniklinik-Koln.git>
 cd etl-patient-data
 ```
 
@@ -206,4 +206,5 @@ Pie chart by source, reasons table, and the full data_quality_log grid.
     * Diagnoses: top 10 codes, primary vs secondary split
 
 * Raw Data Viewer
+
     * Browse any table directly.
