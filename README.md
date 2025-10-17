@@ -55,11 +55,11 @@ This repository contains a containerized Python based Extract, Transform, and Lo
 
 ## Setup and Running the Pipeline
 
-This solution is designed to run end-to-end with minimal setup using **Docker Compose**.
+This solution is designed to run end-to-end with minimal setup using **Docker**.
 
 ### Prerequisites
 
-You must have **Docker** and **Docker Compose** installed on your system.
+You must have **Docker** installed on your system.
 
 ### 1. Clone the Repository
 
@@ -208,3 +208,4 @@ Pie chart by source, reasons table, and the full data_quality_log grid.
 * Raw Data Viewer
 
     * Browse any table directly.
+
