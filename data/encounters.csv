@@ -1,0 +1,12 @@
+encounter_id,patient_id,admit_dt,discharge_dt,encounter_type,source_file
+ENC-000100                                                                           , P-0001    , 2024-12-30 10:00:00+01:00, 2025-01-02 14:30:00+01:00, INPATIENT     , encounters_a.csv
+ENC-000101                                                                           , P-0002    , 12/31/2024 08:00         , 12/31/2024 20:00         , ED            , encounters_a.csv
+ENC-000102                                                                           , P-0003    , 31-12-2024 09:15         , 31-12-2024 12:00         , OUTPATIENT    , encounters_b.csv
+ENC-000103                                                                           , P-0004    , 2024-11-05T09:00:00Z     , 2024-11-04T17:00:00Z     , INPATIENT     , encounters_b.csv
+ENC-000104                                                                           , P-0005    , 2025/01/03 07:30         , 2025/01/03 09:00         , OUTPATIENT    , encounters_b.csv
+
+encounter_id                                                                         , patient_id, admit_dt                 , discharge_dt             , encounter_type, source_file
+ENC-000105                                                                           , P-0007    , 2025-01-05 11:00         ,                          , ED            , encounters_c.csv
+ENC-000106                                                                           , P-0999    , 2025-01-06 10:00         , 2025-01-06 12:00         , OUTPATIENT    , encounters_c.csv
+ENC-000101                                                                           , P-0002    , 2024-12-31 08:00         , 2024-12-31 20:00         , ED            , encounters_dup.csv
+ENC-000200;P-0008;2025-01-07 10:00;2025-01-07 12:00;OUTPATIENT;encounters_c.csv;EXTRA

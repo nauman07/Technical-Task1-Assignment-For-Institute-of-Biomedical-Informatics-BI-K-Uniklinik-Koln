@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Diagnoses xmlns="http://example.org/diagnosis" generatedAt="2025-01-15T10:22:00Z">
+    <Diagnosis>
+        <encounterId>ENC-000100</encounterId>
+        <code system="ICD-10">E11.9</code>
+        <isPrimary>true</isPrimary>
+        <recordedAt>2024-12-31T13:05:00+01:00</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000101</encounterId>
+        <code system="ICD-10">G44</code>
+        <isPrimary>false</isPrimary>
+        <recordedAt>2024-12-31</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000102</encounterId>
+        <code system="ICD-10">I10</code>
+        <isPrimary>true</isPrimary>
+        <recordedAt>2024-12-31T10:00:00Z</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000104</encounterId>
+        <code system="ICD-10">J06.9</code>
+        <recordedAt>2025-01-03T08:00:00+02:00</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000105</encounterId>
+        <code system="ICD-10">ZZZ</code>
+        <isPrimary>true</isPrimary>
+        <recordedAt>2025-01-05T11:10:00</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <code system="ICD-10">E66.9</code>
+        <recordedAt>2025-01-02T09:00:00Z</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000103</encounterId>
+        <code system="ICD-10">M54.5</code>
+        <isPrimary>false</isPrimary>
+        <recordedAt>2024-11-01T10:00:00Z</recordedAt>
+    </Diagnosis>
+    <Diagnosis>
+        <encounterId>ENC-000100</encounterId>
+        <code system="ICD-10">N39.0</code>
+        <isPrimary>false</isPrimary>
+        <recordedAt>2035-01-01T00:00:00Z</recordedAt>
+    </Diagnosis>
+</Diagnoses>

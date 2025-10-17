@@ -1,0 +1,13 @@
+﻿patient_id,given_name,family_name,date_of_birth,sex,height,weight
+P-0001    , Alice     , Müller     , 1987-03-14, F  , 170 cm , 65 kg
+P-0002    , bob       , smith      , 12/31/1990, M  , 68 in  , 150 lb
+P-0003    , Chloé     , Dubois     , 31-12-1985, F  , 162    , 54.5
+P-0004    , David     , O'Neil     ,           , M  , 180 cm , 82 kg
+P-0005    , ERIN      , Lee        , 1999/07/01, F  , 5ft 6in, 130lb
+P-0006    , Fadi      , Haddad     , 2008-02-29, M  , 190 cm , 110 kg
+P-0007    , Gül       , Yılmaz     , 1980-11-05, O  , 175 cm , N/A
+P-0008    , Hannah    , Ng         , 1970-01-01, U  , 220 cm , 300 kg
+P-0009    , Ivan      , Petrov     , 2009-05-03, M  , 70 in  , 180 lb
+P-0010    , JANE      , DOE        , 1991-09-09, F  , 165cm  , 60kg
+P-0002    , Bob       , Smith      , 1990-12-31, M  , 173 cm , 72 kg
+P-0011    , 李        , 雷         , 1988-08-08, M  , 170    , 65

@@ -1,0 +1,58 @@
+services:
+  # 1. PostgreSQL Database Service
+  db:
+    image: postgres:14-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: patient_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    healthcheck: # Ensure the DB is ready before the ETL starts
+      test: ["CMD-SHELL", "pg_isready -U user -d patient_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. ETL Service
+  etl:
+    build: .
+    container_name: etl_service
+    command: python etl_scripts/load.py
+    volumes:
+      - .:/app # Mount the entire project directory
+    depends_on:
+      db:
+        condition: service_healthy # Wait for the DB to be ready
+    environment:
+      DB_HOST: db
+      DB_NAME: patient_db
+      DB_USER: user
+      DB_PASSWORD: password
+
+  # 3. Dashboard Service (e.g., using Streamlit)
+  dashboard:
+    build: .
+    container_name: dashboard_service
+    command: streamlit run dashboard/app.py --server.port 8501 --server.enableCORS false
+    volumes:
+      - .:/app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - etl # Run the dashboard after the data has been loaded
+# Add this service to your existing docker-compose.yml:
+  adminer:
+    image: adminer:latest
+    container_name: adminer_tool
+    ports:
+      - "8080:8080"  # Map Adminer's default port 8080 to host port 8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
