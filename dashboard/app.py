@@ -260,7 +260,7 @@ if table_choice == "patients" and not df_patients.empty:
                     title="Age Distribution (years)",
                     template="plotly",
                     marginal="box" # Add a box plot for summary stats
-                ).update_xaxes(title="Age (years)")
+                )
                 st.plotly_chart(fig_age, use_container_width=True)
 
     # Height/Weight
@@ -553,3 +553,4 @@ elif raw_choice == "diagnoses":
     st.dataframe(df_diagnoses, height=320, use_container_width=True)
 else:
     st.dataframe(df_dq, height=320, use_container_width=True)
+
