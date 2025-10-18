@@ -64,8 +64,8 @@ You must have **Docker** installed on your system.
 ### 1. Clone the Repository
 
 ```bash
-git clone <https://github.com/nauman07/Technical-Task1-Assignment-For-Institute-of-Biomedical-Informatics-BI-K-Uniklinik-Koln.git>
-cd etl-patient-data
+git clone https://github.com/nauman07/Technical-Task1-Assignment-For-Institute-of-Biomedical-Informatics-BI-K-Uniklinik-Koln.git
+cd <your-project-folder>
 ```
 
 ### 2. Run
@@ -208,4 +208,5 @@ Pie chart by source, reasons table, and the full data_quality_log grid.
 * Raw Data Viewer
 
     * Browse any table directly.
+
 
