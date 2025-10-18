@@ -19,7 +19,7 @@ This repository contains a containerized Python based Extract, Transform, and Lo
 
     * Sanitization: removes control chars, trims, collapses whitespace, and truncates to schema lengths (with DQ logs for truncations).
 
-    * Normalization: names → title case, sex values normalized (M, F, or U); encounter types uppercased.
+    * Normalization: names → title case, sex values unknown set to U; encounter types uppercased.
 
     * De-duplication
 
@@ -155,6 +155,7 @@ The pipeline adds a row to data_quality_log whenever it makes or detects a non-t
     * Weight: lb → kg, assumed kg for unitless numeric
 
     * Implausible values (height not in 30–272 cm, weight not in 2–635 kg) → set NULL
+    * For both height and unitless values are checked under the normal range for different units, and then decided to be treated as which unit.
 
 * Dates
 
@@ -208,6 +209,7 @@ Pie chart by source, reasons table, and the full data_quality_log grid.
 * Raw Data Viewer
 
     * Browse any table directly.
+
 
 
 
