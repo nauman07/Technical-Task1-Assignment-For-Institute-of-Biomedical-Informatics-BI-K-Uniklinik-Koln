@@ -1,5 +1,3 @@
-# utils.py
-
 import os
 import re
 import logging
@@ -146,15 +144,13 @@ def titlecase_or_none(s: Optional[str]) -> Optional[str]:
     return None if s is None else s.strip().title()
 
 def normalize_sex(s: Optional[str], file_name: str, row_id: str) -> Optional[str]:
-    """Normalize sex to 'M', 'F', or 'U' (Unknown), logging non-standard values."""
+    """Making null value in sex as 'U' (Unknown). and logging it."""
     if s is None:
         dq(file_name, row_id, "sex", None, "Missing sex; set to 'U'.")
         return "U"
-    c = s.strip().upper()
-    if c in {"M", "F"}:
+    else:
+        c = s.strip().upper()
         return c
-    dq(file_name, row_id, "sex", s, "Unknown sex value; normalized to 'U'.")
-    return "U"
 
 def parse_datetime_any(s: Optional[str], file_name: str, row_id: str, col: str) -> Optional[pd.Timestamp]:
     """Robustly parse a datetime string, validate against future cutoff, and return UTC Timestamp."""
@@ -178,74 +174,133 @@ def parse_datetime_any(s: Optional[str], file_name: str, row_id: str, col: str) 
         dq(file_name, row_id, col, raw, "Invalid datetime format; set NULL.")
         return None
 
+# --- Plausible Ranges for Cross-Unit Guessing ---
+# Typical adult human range (e.g., from 1 ft to 8 ft 11 in)
+HEIGHT_CM_MIN, HEIGHT_CM_MAX = 30.0, 272.0 # 1 ft to 8 ft 11 in
+HEIGHT_IN_MIN, HEIGHT_IN_MAX = 12.0, 107.0 # 1 ft to 8 ft 11 in
+# Typical adult human range (e.g., from 4 lbs to 1400 lbs)
+WEIGHT_KG_MIN, WEIGHT_KG_MAX = 2.0, 635.0  # ~4.4 lbs to 1400 lbs
+WEIGHT_LB_MIN, WEIGHT_LB_MAX = 4.4, 1400.0 # 4.4 lbs to 1400 lbs
+
+# --- Helper function for unitless number check ---
+def _try_float(s: str) -> Optional[float]:
+    """Safely convert a string to a float if it is a simple number."""
+    try:
+        if not re.match(r'^\s*[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*$', s):
+            return None
+        return float(s)
+    except ValueError:
+        return None
+
+
 def to_height_cm(val: Optional[str], file_name: str, row_id: str) -> Optional[float]:
-    """Convert various height formats (cm, in, ft+in, unitless number) to centimeters (cm)."""
+    """Convert various height formats (cm, in, ft+in, unitless number) to centimeters (cm) 
+    with improved unitless guessing based on plausible ranges."""
     if val is None:
         dq(file_name, row_id, "height", None, "Missing height; set NULL.")
         return None
     s = str(val).strip()
 
-    # 1. Foot/Inch format (e.g., 5'10" or 5.5 ft 2 in)
+    # 1. Foot/Inch format
     m = _height_ftin_re.match(s)
     if m:
         ft = float(m.group("ft")); inch = float(m.group("inch")) if m.group("inch") else 0.0
         cm = ft * 30.48 + inch * 2.54
         dq(file_name, row_id, "height", s, f"Converted height ft+in→cm: {s} → {round(cm,2)}")
-        if 30 <= cm <= 272: return round(cm, 2) # Range check (30cm to 272cm)
+        if HEIGHT_CM_MIN <= cm <= HEIGHT_CM_MAX: return round(cm, 2)
         dq(file_name, row_id, "height", s, "Implausible height after ft+in conversion; set NULL.")
         return None
 
-    # 2. Inches format (e.g., 70 in)
+    # 2. Inches format
     m = _height_in_re.match(s)
     if m:
         inches = float(m.group("num"))
         cm = inches * 2.54
         dq(file_name, row_id, "height", s, f"Converted height in→cm: {s} → {round(cm,2)}")
-        if 30 <= cm <= 272: return round(cm, 2)
+        if HEIGHT_CM_MIN <= cm <= HEIGHT_CM_MAX: return round(cm, 2)
         dq(file_name, row_id, "height", s, "Implausible height after inches conversion; set NULL.")
         return None
 
-    # 3. Centimeters or Unitless Number (e.g., 178 cm or 178)
+    # 3. Centimeters format (explicit 'cm' unit)
     m = _height_cm_re.match(s)
-    if m:
+    if m and any(unit in s.lower() for unit in ["cm", "centimeters"]):
         cm = float(m.group("num"))
-        if 30 <= cm <= 272:
-            if "cm" not in s.lower():
-                dq(file_name, row_id, "height", s, f"Assumed centimeters for unitless value; kept as {round(cm,2)} cm.")
+        if HEIGHT_CM_MIN <= cm <= HEIGHT_CM_MAX:
             return round(cm, 2)
-        dq(file_name, row_id, "height", s, "Implausible cm value for height; set NULL.")
+        dq(file_name, row_id, "height", s, "Implausible explicit cm value for height; set NULL.")
+        return None
+    
+    # 4. Unitless Number - NEW HEURISTIC
+    unitless_val = _try_float(s)
+    if unitless_val is not None:
+        
+        # Check if it fits the plausible CM range (default assumption)
+        if HEIGHT_CM_MIN <= unitless_val <= HEIGHT_CM_MAX:
+            dq(file_name, row_id, "height", s, f"Assumed centimeters (in CM range); kept as {round(unitless_val,2)} cm.")
+            return round(unitless_val, 2)
+        
+        # Check if it fits the plausible INCH range
+        if HEIGHT_IN_MIN <= unitless_val <= HEIGHT_IN_MAX:
+            cm_guessed = round(unitless_val * 2.54, 2)
+            dq(file_name, row_id, "height", s, f"Assumed inches (in IN range); converted to {cm_guessed} cm.")
+            return cm_guessed
+
+        # If it doesn't fit a plausible range for either, it's implausible
+        dq(file_name, row_id, "height", s, "Implausible unitless value for height (not in CM or IN range); set NULL.")
         return None
 
     dq(file_name, row_id, "height", s, "Unrecognized height format; set NULL.")
     return None
 
+
 def to_weight_kg(s: Optional[str], file_name: str, row_id: str) -> Optional[float]:
-    """Convert various weight formats (kg, lb, unitless number) to kilograms (kg)."""
+    """Convert various weight formats (kg, lb, unitless number) to kilograms (kg)
+    with improved unitless guessing based on plausible ranges."""
     if s is None:
         dq(file_name, row_id, "weight", None, "Missing weight; set NULL.")
         return None
+    
     m = _weight_re.match(str(s))
-    if not m:
-        dq(file_name, row_id, "weight", s, "Unrecognized weight format; set NULL.")
+    
+    # 1. Explicit Unit (kg or lb)
+    if m:
+        val = float(m.group("num"))
+        unit = m.group("Unit").lower() if m.group("Unit") else None
+        
+        if unit == "lb":
+            kg = round(val * 0.45359237, 2)
+            if WEIGHT_KG_MIN <= kg <= WEIGHT_KG_MAX:
+                dq(file_name, row_id, "weight", str(s), f"Converted weight lb→kg: {s} → {kg}")
+                return kg
+            dq(file_name, row_id, "weight", str(s), "Implausible weight after lb→kg conversion; set NULL.")
+            return None
+        
+        # Explicit KG
+        if unit == "kg":
+            if WEIGHT_KG_MIN <= val <= WEIGHT_KG_MAX:
+                return round(val, 2)
+            dq(file_name, row_id, "weight", str(s), "Implausible explicit kg value for weight; set NULL.")
+            return None
+    
+    # 2. Unitless Number - NEW HEURISTIC
+    unitless_val = _try_float(str(s))
+    if unitless_val is not None:
+        
+        # Check if it fits the plausible KG range (default assumption)
+        if WEIGHT_KG_MIN <= unitless_val <= WEIGHT_KG_MAX:
+            dq(file_name, row_id, "weight", str(s), f"Assumed kilograms (in KG range); kept as {round(unitless_val, 2)} kg.")
+            return round(unitless_val, 2)
+        
+        # Check if it fits the plausible LB range
+        if WEIGHT_LB_MIN <= unitless_val <= WEIGHT_LB_MAX:
+            kg_guessed = round(unitless_val * 0.45359237, 2)
+            dq(file_name, row_id, "weight", str(s), f"Assumed pounds (in LB range); converted to {kg_guessed} kg.")
+            return kg_guessed
+
+        # If it doesn't fit a plausible range for either, it's implausible
+        dq(file_name, row_id, "weight", str(s), "Implausible unitless value for weight (not in KG or LB range); set NULL.")
         return None
     
-    val = float(m.group("num"))
-    unit = m.group("Unit").lower() if m.group("Unit") else None
-    
-    if unit == "lb":
-        kg = round(val * 0.45359237, 2)
-        dq(file_name, row_id, "weight", str(s), f"Converted weight lb→kg: {s} → {kg}")
-        return kg
-    
-    # Assumed or explicit KG
-    if unit in (None, "kg"):
-        if unit is None:
-            dq(file_name, row_id, "weight", str(s), f"Assumed kilograms for unitless value; kept as {val} kg.")
-        # Range check (2kg to 635kg - 1400lbs)
-        if not (2 <= val <= 635):
-            dq(file_name, row_id, "weight", str(s), "Implausible kg value for weight; set NULL.")
-            return None
-        return round(val, 2)
-    
-    dq(file_name, row_id, "weight", str(s), "Unknown weight unit; set NULL.")
+    # Falls through if no explicit unit matched and not a simple number
+    dq(file_name, row_id, "weight", s, "Unrecognized weight format; set NULL.")
     return None
