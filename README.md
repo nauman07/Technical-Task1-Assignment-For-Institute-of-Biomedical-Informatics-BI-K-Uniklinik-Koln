@@ -70,7 +70,7 @@ cd <your-project-folder>
 
 ### 2. Run
 ```bash
-docker compose up --build
+docker-compose up --build
 ```
 
 ## Repository Structure
@@ -208,5 +208,6 @@ Pie chart by source, reasons table, and the full data_quality_log grid.
 * Raw Data Viewer
 
     * Browse any table directly.
+
 
 
